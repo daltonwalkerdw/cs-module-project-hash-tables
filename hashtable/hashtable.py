@@ -21,7 +21,8 @@ class HashTable:
     """
 
     def __init__(self, capacity):
-        # Your code here
+        self.capacity = capacity
+        self.buckets = [None] * capacity
 
 
     def get_num_slots(self):
@@ -62,7 +63,10 @@ class HashTable:
 
         Implement this, and/or FNV-1.
         """
-        # Your code here
+        hash = 5381
+        for c in key:
+            hash = (hash * 33) + ord(c)
+        return hash
 
 
     def hash_index(self, key):
@@ -70,8 +74,10 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        #return self.fnv1(key) % self.capacity
-        return self.djb2(key) % self.capacity
+        hash_value = self.djb2(key)
+        
+        index = hash_value % len(self.buckets)
+        return index
 
     def put(self, key, value):
         """
@@ -81,7 +87,19 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        
+        index = self.hash_index(key)
+        if self.buckets[index] is not None:
+            # search the linked list for a node with the same key as the one we are inserting
+                # if it exist
+                    #change the value of the node
+                    # return
+                # if it doesn't exist do the following steps
+                
+                # the first item in the hasharray is the head of the linked list
+                # create a new hashtableentry and add it to the head of the linked list
+                # make the new entry the new head
+        self.buckets[index] = HashTableEntry(key, value)
 
 
     def delete(self, key):
@@ -92,8 +110,16 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
-
+        # check to see if their is a key
+        #if no key found print warning
+        # else remove the value
+        hash_index = self.hash_index(key)
+        # search through the linked list until we find the node to delete
+        # delete the node if found
+        if self.buckets[hash_index] == None:
+            print("Nothing in that slot")
+        else:
+            self.buckets[hash_index].value = None
 
     def get(self, key):
         """
@@ -103,7 +129,13 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        hash_index = self.hash_index(key)
+
+        # search / loop through the linked list at the hashed index
+        # compare the key to search to the keys in the nodes
+        # if you find it return the value
+        # if not return none
+        return self.buckets[hash_index].value
 
 
     def resize(self, new_capacity):
@@ -132,8 +164,9 @@ if __name__ == "__main__":
     ht.put("line_10", "Long time the manxome foe he sought--")
     ht.put("line_11", "So rested he by the Tumtum tree")
     ht.put("line_12", "And stood awhile in thought.")
+    ht.get("")
 
-    print("")
+    
 
     # Test storing beyond capacity
     for i in range(1, 13):
@@ -146,8 +179,4 @@ if __name__ == "__main__":
 
     print(f"\nResized from {old_capacity} to {new_capacity}.\n")
 
-    # Test if data intact after resizing
-    for i in range(1, 13):
-        print(ht.get(f"line_{i}"))
-
-    print("")
+ 
