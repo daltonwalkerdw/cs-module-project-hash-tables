@@ -6,6 +6,47 @@ class HashTableEntry:
         self.key = key
         self.value = value
         self.next = None
+    
+class LinkedList:
+
+    def __init__(self):
+        self.head = None
+    
+    def find(self, key):
+        next_node = self.head
+
+        # value not found
+        if next_node is None:
+            return None
+        else:
+            while next_node.next is not None:
+                if next_node.key == key:
+                    # return the found item
+                    return next_node
+                else:
+                    next_node = next_node.next
+
+        return next_node
+
+    def insert_at_head(self, node):
+        node.next = self.head
+        self.head = node
+        #Also updates
+
+    def delete(self, key):
+        if key == self.head.key:
+            self.head = self.head.next
+            return self.head
+        prev = None
+        curr = self.head
+        while curr is not None:
+            if curr.key == key:
+                prev.next = curr.next
+                return curr
+
+            prev = curr
+            curr = curr.next
+        return None
 
 
 # Hash table can't have fewer than this many slots
@@ -22,7 +63,8 @@ class HashTable:
 
     def __init__(self, capacity):
         self.capacity = capacity
-        self.buckets = [None] * capacity
+        self.buckets = [None] * capacity 
+        self.number_of_items = 0
 
 
     def get_num_slots(self):
@@ -35,7 +77,7 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        return self.capacity
 
 
     def get_load_factor(self):
@@ -44,7 +86,7 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        return self.number_of_items / self.capacity
 
 
     def fnv1(self, key):
@@ -76,7 +118,7 @@ class HashTable:
         """
         hash_value = self.djb2(key)
         
-        index = hash_value % len(self.buckets)
+        index = hash_value % self.capacity
         return index
 
     def put(self, key, value):
@@ -87,19 +129,35 @@ class HashTable:
 
         Implement this.
         """
-        
-        index = self.hash_index(key)
-        if self.buckets[index] is not None:
+        if self.get_load_factor() >= 0.7:
+            self.resize(self.capacity * 2)
+
+        current = self.buckets[self.hash_index(key)]
             # search the linked list for a node with the same key as the one we are inserting
-                # if it exist
-                    #change the value of the node
+        
+        if current is not None:
+                # if it exist\
+            new_list = LinkedList()           
+            self.buckets[self.hash_index(key)] = new_list
+            new_list.insert_at_head(HashTableEntry(key, value))
+            self.number_of_items + 1
                     # return
+        else:
+            # if the new key/item doesn't exist, add it as a new head
+            if current == None:
+                current = (HashTableEntry(key, value))
+                self.number_of_items += 1
+            else:
+                # change the current node to the new node
+                current.insert_at_head(HashTableEntry(key, value))
+            
                 # if it doesn't exist do the following steps
-                
                 # the first item in the hasharray is the head of the linked list
+        
+
                 # create a new hashtableentry and add it to the head of the linked list
                 # make the new entry the new head
-        self.buckets[index] = HashTableEntry(key, value)
+        
 
 
     def delete(self, key):
@@ -129,13 +187,15 @@ class HashTable:
 
         Implement this.
         """
-        hash_index = self.hash_index(key)
+        current = self.buckets[self.hash_index(key)]
+        
 
-        # search / loop through the linked list at the hashed index
-        # compare the key to search to the keys in the nodes
-        # if you find it return the value
-        # if not return none
-        return self.buckets[hash_index].value
+        if current is not None:
+            # should return the node value
+            return current.value
+        else:
+            # should return none
+            return current
 
 
     def resize(self, new_capacity):
@@ -145,7 +205,21 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        # Create a blank new array with double size of the old array
+        old = self.buckets
+        self.capacity = new_capacity
+        self.buckets = [None] * self.capacity
+
+        for i in old:
+            if i is None:
+                continue
+            else:
+                self.put(i.key, i.value)
+        # rehase every single item because the hash function has changed
+            # go through each slot in the array
+                # rehase the key in each item and store in new array
+            
+            # make new array the new storage
 
 
 
